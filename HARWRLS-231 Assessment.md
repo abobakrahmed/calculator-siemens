@@ -2,9 +2,9 @@
 
 # **1\. Scope**
 
-The goal of this assessment is to automate the process of synchronizing, testing, and deploying a React UI library across different tools in a company. The UI library developers must ensure that the latest version of the library is always used by the tool developers and that broken or incompatible versions are identified before deployment. Automation will streamline the library's communication, testing, and synchronization, reducing manual efforts and minimizing the risks of using broken or incompatible components.
+The goal of this assessment is to automate the process of synchronizing, testing, and deploying a React UI library across different tools in a company. 
 
-# **2\. Solution Design**
+2\. Solution Design
 
 The system involves the following major components:  
 \- React UI Library (TypeScript): This is the shared component library used by all internal tools.  
@@ -19,7 +19,7 @@ The system involves the following major components:
 ## **a. Version Control & Sync (GitLab/GitHub)**
 
 All changes to the React UI library will be managed using Git. The tools developers will be able to pull the latest version automatically from the repository.  
-1\. GitLab or GitHub: Used for source code management.  
+1\. GitHub: Used for source code management.  
 \- Create branches for feature updates.  
 \- Use Merge Requests/PRs to review changes.
 
@@ -31,10 +31,8 @@ A CI/CD pipeline will automate the process of building, testing, and deploying t
 
 Example of a test script:
 
-"scripts": {  
-  "test": "jest",  
-  "build": "tsc && webpack"  
-}
+| "scripts": {  "test": "jest",  "build": "tsc && webpack"} |
+| :---- |
 
 ## **c. Automated Dependency Updates**
 
@@ -45,60 +43,11 @@ Example of a test script:
 
 Here’s an example of a GitLab CI/CD pipeline (.gitlab-ci.yml) that automates testing, building, and publishing the React UI library.
 
-stages:  
-  \- test  
-  \- build  
-  \- deploy
-
-variables:  
-  NODE\_ENV: "production"  
-  NPM\_REGISTRY\_URL: "http://nexus.internal-company.com/repository/npm-private/"
-
-cache:  
-  paths:  
-    \- node\_modules/
-
-test:  
-  stage: test  
-  script:  
-    \- npm install  
-    \- npm run test  
-  only:  
-    \- master  
-    \- merge\_requests
-
-build:  
-  stage: build  
-  script:  
-    \- npm install  
-    \- npm run build  
-  artifacts:  
-    paths:  
-      \- dist/  
-  only:  
-    \- master
-
-deploy:  
-  stage: deploy  
-  script:  
-    \- npm config set registry $NPM\_REGISTRY\_URL  
-    \- npm publish  
-  only:  
-    \- master
+| name: React App CI\# Trigger workflow on push or pull request to the 'main' branchname: React App CI\# Trigger workflow on push or pull request to the 'main' branchon:  push:    branches:      \- main  pull\_request:    branches:      \- mainjobs:  build:    runs-on: ubuntu-latest    steps:      \# Step 1: Checkout the repository      \- name: Checkout repository        uses: actions/checkout@v2      \# Step 2: Set up Node.js environment      \- name: Set up Node.js        uses: actions/setup-node@v2        with:          node-version: '18.x'      \# Step 3: Cache node\_modules for faster builds      \- name: Cache node\_modules        uses: actions/cache@v2        with:          path: node\_modules          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}          restore-keys: |            ${{ runner.os }}\-node-      \# Step 4: Install dependencies using npm      \- name: Install Dependencies        run: npm install      \# Step 5: Run tests      \- name: Run Tests        run: npm test \-- \--watchAll=false      \# Step 6: Build the React app      \- name: Build React App        run: npm run build      \# Optional Step: Deploy React app (e.g., to GitHub Pages or a cloud provider)      \# Uncomment this section if you want to deploy      \# deploy:      \#   runs-on: ubuntu-latest      \#   needs: build      \#   steps:      \#     \- name: Checkout repository      \#       uses: actions/checkout@v2      \#     \- name: Deploy to GitHub Pages      \#       run: |      \#         npm run deploy |
+| :---- |
 
 # **5\. Diagram of Automated System**
 
-\+------------------+    \+------------------+    \+------------------+  
-|                  |    |                  |    |                  |  
-|   React UI Dev   \+---\>|  CI/CD Pipeline   \+---\>|  Private NPM      |  
-|   Team           |    |  (Build/Test)     |    |  Registry         |  
-|                  |    |                  |    |                  |  
-\+------------------+    \+------------------+    \+------------------+  
-                            |  
-                            v  
-                     \+------------------+  
-                     |                  |  
-                     |   Application    |  
-                     |   Developers     |  
-                     |                  |  
-                     \+------------------+  
+| \+------------------+    \+------------------+    \+------------------+|                  |    |                  |    |                  ||   React UI Dev   \+---\>|  CI/CD Pipeline   \+---\>|  Private NPM      ||   Team           |    |  (Build/Test)     |    |  Registry         ||                  |    |                  |    |                  |\+------------------+    \+------------------+    \+------------------+                            |                            v                     \+------------------+                     |                  |                     |   Application    |                     |   Developers     |                     |                  |                     \+------------------+ |
+| :---- |
+
